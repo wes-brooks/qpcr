@@ -1,0 +1,6 @@
+\frametitle {The experimental procedure}Do the following for each reaction:
+  \begin{lstlisting}
+for (cycle in 1:40):
+    count the gene copies
+    use PCR to produce a new generation
+  \end{lstlisting}
