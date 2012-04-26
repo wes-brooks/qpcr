@@ -292,9 +292,9 @@ Reminder: our idealized estimator was $W(n) = \frac{N_n}{(1+p)^n} $
 %qPCR as a branching process
 \begin{frame}{Variance of the estimator}
 \begin{align*}
-\sigma^2_L &= \text{var}[\frac{N_j}{(1+p)^j}] = E(\text{var}[\frac{N_j}{(1+p)^j}|p]) + \text{var}(E[\frac{N_j}{(1+p)^j}|p])\\
-&= E(\text{var}[\frac{N_j}{(1+p)^j}|p])  + \text{var}(m_a)\\
-&= E(\text{var}[\frac{N_j}{(1+p)^j}|p])
+\sigma^2_L &= \text{var}[\frac{N_n}{(1+p)^n}] = E(\text{var}[\frac{N_n}{(1+p)^n}|p]) + \text{var}(E[\frac{N_n}{(1+p)^n}|p])\\
+&= E(\text{var}[\frac{N_n}{(1+p)^n}|p])  + \text{var}(m_a)\\
+&= E(\text{var}[\frac{N_n}{(1+p)^n}|p])
 \end{align*}
 \end{frame}
 
@@ -302,15 +302,15 @@ Reminder: our idealized estimator was $W(n) = \frac{N_n}{(1+p)^n} $
 %qPCR as a branching process
 \begin{frame}{Variance of the estimator}
 \begin{align*}
-\text{var}[\frac{N_j}{(1+p)^j}|p] &= \frac{1}{(1+p)^{2j}}\text{var}[N_j|p] \\
-&= \frac{1}{(1+p)^{2j}} ( E(\text{var}[N_j|N_{j-1},p]|p) + \text{var}(E[N_j|N_{j-1},p]|p) ) \\
-&= \frac{1}{(1+p)^{2j}} ( E[N_{j-1}p(1-p)|p] + \text{var}((1+p)N_{j-1}|p) ) \\
-&= \frac{1}{(1+p)^{2j}} ( m_a (1+p)^{j-1}p(1-p) + (1+p)^2\text{var}[N_{j-1}|p] ) \\
-&= \frac{m_a p (1-p)}{(1+p)^{j+1}}  + \frac{\text{var}[N_{j-1}|p]}{(1+p)^{2j-2}} \\
+\text{var}[\frac{N_n}{(1+p)^n}|p] &= \frac{1}{(1+p)^{2n}}\text{var}[N_n|p] \\
+&= \frac{1}{(1+p)^{2n}} ( E(\text{var}[N_n|N_{n-1},p]|p) + \text{var}(E[N_n|N_{n-1},p]|p) ) \\
+&= \frac{1}{(1+p)^{2n}} ( E[N_{n-1}p(1-p)|p] + \text{var}((1+p)N_{n-1}|p) ) \\
+&= \frac{1}{(1+p)^{2n}} ( m_a (1+p)^{n-1}p(1-p) + (1+p)^2\text{var}[N_{n-1}|p] ) \\
+&= \frac{m_a p (1-p)}{(1+p)^{n+1}}  + \frac{\text{var}[N_{n-1}|p]}{(1+p)^{2n-2}} \\
 &= \dots \\
-&= \frac{m_a p (1-p)}{(1+p)^{j+1}}  + \frac{m_a p (1-p)}{(1+p)^{j}} + \dots + \frac{m_a p (1-p)}{(1+p)^{2}} \\ &+ \frac{\text{var}[N_{0}|p]}{(1+p)^{2j-2j}} \\
-&= \frac{m_a p (1-p)}{(1+p)^{j+1}}  + \frac{m_a p (1-p)}{(1+p)^{j}} + \dots + \frac{m_a p (1-p)}{(1+p)^{2}} \\ 
-& + \frac{\text{var}[N_{0}|p]}{(1+p)^{2j-2j}} \\
+&= \frac{m_a p (1-p)}{(1+p)^{n+1}}  + \frac{m_a p (1-p)}{(1+p)^{n}} + \dots + \frac{m_a p (1-p)}{(1+p)^{2}} \\ &+ \frac{\text{var}[N_{0}|p]}{(1+p)^{2n-2n}} \\
+&= \frac{m_a p (1-p)}{(1+p)^{n+1}}  + \frac{m_a p (1-p)}{(1+p)^{n}} + \dots + \frac{m_a p (1-p)}{(1+p)^{2}} \\ 
+& + \frac{\text{var}[N_{0}|p]}{(1+p)^{2n-2n}} \\
 \end{align*}
 \end{frame}
 
@@ -318,13 +318,13 @@ Reminder: our idealized estimator was $W(n) = \frac{N_n}{(1+p)^n} $
 %qPCR as a branching process
 \begin{frame}{Variance of the estimator}
 \begin{align*}
-\text{var}[\frac{N_j}{(1+p)^j}|p] &= \frac{m_a p (1-p)}{(1+p)^{2}} \Sigma_{k=0}^{j-1}\frac{1}{(1+p)^k} + \sigma^2_a \\ 
-&= m_a  \frac{1-p}{1+p} + \sigma^2_a \\
+\text{var}[\frac{N_n}{(1+p)^n}|p] &= \frac{m_a p (1-p)}{(1+p)^{2}} \Sigma_{k=0}^{n-1}\frac{1}{(1+p)^k} + \sigma^2_a \\ 
+&\to m_a  \frac{1-p}{1+p} + \sigma^2_a \\
 \end{align*}
 So:
 \begin{align*}
-\text{var}[\frac{N_j}{(1+p)^j}] &= E(\text{var}[\frac{N_j}{(1+p)^j}|p])\\
-&= E(m_a \frac{1-p}{1+p} + \sigma^2_a) \\
+\text{var}[\frac{N_j}{(1+p)^n}] &= E(\text{var}[\frac{N_n}{(1+p)^n}|p])\\
+&\to E(m_a \frac{1-p}{1+p} + \sigma^2_a) \\
 &= m_a E(\frac{1-p}{1+p}) + \sigma^2_a = \sigma^2_L
 \end{align*}
 \end{frame}
