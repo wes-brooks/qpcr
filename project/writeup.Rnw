@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{subfig}
+\usepackage{pstricks,pst-node,pst-tree}
+
+
+
+\title{MCMC inference for qPCR quantitation via branching processes}
+\author{Wesley Brooks}
+\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\setkeys{Gin}{width=0.9\textwidth}    %make figures a bit wider than the Sweave default.
+\maketitle
+
+<<label=read_data, echo=FALSE>>=
+@
+
+\section{Overview}
+The technology called the Quantitative Polymerase Chain Reaction (qPCR) is commonly used in experiments to measure the difference in gene expression between subjects exposed to different treatments or conditions. Because DNA particles are too tiny and too few to count directly, qPCR amplifies the particles via repeated iterations of the polymerase reaction. Then the amplified particles are counted and used for inference about the original particles.\\
+
+Classical inference about qPCR experiments has made some untenable assumptions, such as that each partice of DNA replicates during each iteration of the polymerase reaction. \cite{hanlon:2012}\\
+
+
+\section{Scope of the project}
+Markov Chain Monte Carlo (MCMC) is used in this project to 
+
+
+
+\bibliographystyle{plain}
+\bibliography{../references/qpcr}
+
+\end{document}
+
