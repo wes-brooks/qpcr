@@ -5,9 +5,10 @@
 \usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{subfig}
-\usepackage{pstricks,pst-node,pst-tree}
 
+\newtheorem{model}{Data-Generating Model}
 
 
 \title{MCMC inference for qPCR quantitation via branching processes}
@@ -19,51 +20,23 @@
 \setkeys{Gin}{width=0.9\textwidth}    %make figures a bit wider than the Sweave default.
 \maketitle
 
-<<label=read_data, echo=FALSE>>=
-    lh = readMat("../data/LH.mat")
-@
-
-<<label=prior, echo=FALSE>>=
-    #mu is the mean of the initial fluorescence, and also its variance (up to a scaling factor)
-    mu.t = abs(rnorm(n=1, mean=0, sd=5))
-    mu.c = abs(rnorm(n=1, mean=0, sd=5))
-    
-    #kappa is the scale of the precision of the initial fluorescence
-    kappa = rgamma(n=1, shape=0.1, rate=0.00001)
-    
-    #alpha and beta are logistic regression parameters that model the reaction efficiency decreasing with cycle number
-    a.t = rnorm(n=1, mean=10, sd=7.5)
-    a.c = rnorm(n=1, mean=10, sd=7.5)
-    b.t = rnorm(n=1, mean=-1.5, sd=0.5)
-    b.c = rnorm(n=1, mean=-1.5, sd=0.5)
-        
-    #tau.p is the precision of the logistic regression model for p
-    t.p = rgamma(n=1, shape=0.5, rate=0.0005)
-    
-    #tau.y is the precision of the fluorescence observation
-    t.y = rgamma(n=1, shape=0.5, rate=0.0005)    
-@
-
-
-<<label=mcmc, echo=flase>>=
-    S = 50000000
-    thin = 10000
-    burn = 500
-    
-    for (i in 1:S) {
-        for(c in dim(lh[['TargetMatrix']])[2])
-    }
-@
-
     
 \section{Overview}
-The technology called the Quantitative Polymerase Chain Reaction (qPCR) is commonly used in experiments to measure the difference in gene expression between subjects exposed to different treatments or conditions. Because DNA particles are too tiny and too few to count directly, qPCR amplifies the particles via repeated iterations of the polymerase reaction. Then the amplified particles are counted and used for inference about the original particles.\\
+Bret: because you are quite familiar with may project and its background, I will dispense with some formality in the presentation and get right to the results and discussion.\\
 
-Classical inference about qPCR experiments has made some untenable assumptions, such as that each partice of DNA replicates during each iteration of the polymerase reaction. \cite{hanlon:2012}\\
+In this project, I use the method presented in \cite{norway:2010} to do inference for a qPCR experiment. The dataset I'll analyze was originally presented in \cite{hanlon:2012}. The experiment was designed as for benchmarking - a cDNA sample was diluted by a factor of 3 and botht the original sample and the diluted sample were run through a qPCR machine. Ideally, our data analysis should recover the known dilution factor. When introducing their analytic method, \cite{norway:2010} used two experiments to justify their results: one was a simulation study and the other an experimental study. But because the experimental study was not controlled in the way I've described above, it was not possible to compare their presented results to a known 'true' dilution.\\
+
+The data analysis is done via Markov Chain Monte Carlo (MCMC) under the model presented in \cite{norway:2010}. That model is:\\
+
+Data: $Y_{ij}$ are observed fluorescence intensities which are modeled as an underlying fluorescence $X_{ij}$ plus additive noise:
+\[
+    Y_{ij} \sim \text{Normal}(X_{ij}, \tau_y)
+\]
+
 
 
 \section{Scope of the project}
-Markov Chain Monte Carlo (MCMC) is used in this project to 
+
 
 
 

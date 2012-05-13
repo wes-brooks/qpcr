@@ -63,30 +63,29 @@ p[[1]][['c']] = p.c
 
 
 #MCMC parameters
-S = 5
 tau.y = vector()
 tau.p = vector()
 kappa = vector()
-mu.t = list()
-mu.c = list()
-alpha.t = list()
-beta.t = list()
-alpha.c = list()
-beta.c = list()
+mu.t = vector()
+mu.c = vector
+alpha.t = vector()
+beta.t = vector()
+alpha.c = vector()
+beta.c = vector()
 
-mu.t[[1]] = m.t
-mu.c[[1]] = m.c
-alpha.t[[1]] = a.t
-beta.t[[1]] = b.t
-alpha.c[[1]] = a.c
-beta.c[[1]] = b.c
+mu.t = c(m.t)
+mu.c = c(m.c)
+alpha.t = c(a.t)
+beta.t = c(b.t)
+alpha.c = c(a.c)
+beta.c = c(b.c)
 
 #This function is used in updating tau.y
 tauysum = function(Y, X, p) {
     tot = 0
     for (k in 1:dim(Y)[2]) {
         for (l in 1:dim(Y)[1]) {
-            tot = tot + (Y[l,k] - X[1,k]*prod(1+p[1:l,k]))**2
+            tot = tot + (Y[l,k] - X[k]*prod(1+p[1:l,k]))**2
         }
     }
     return(tot)
@@ -97,7 +96,7 @@ taupsum = function(Y, X, p, a, b) {
     tot = 0
     for (j in 1:dim(Y)[2]) {
         for (i in 1:dim(Y)[1]) {
-            tot = tot + (log(p[i,j]/(1-p[i,j])) - a - b*X[1,j]*prod(1+p[1:i,j]))**2
+            tot = tot + (log(p[i,j]/(1-p[i,j])) - a - b*X[j]*prod(1+p[1:i,j]))**2
         }
     }
     return(tot)
@@ -109,7 +108,7 @@ Xmat = function(X, p) {
     X2 = vector()
     for (i in 1:dim(p)[1]) {
         for (j in 1:dim(p)[2]) {
-            X2 = c(X2, X[1,j]*prod(1+p[1:i,j]))
+            X2 = c(X2, X[j]*prod(1+p[1:i,j]))
         }
     }
     return(as.matrix(data.frame(X1=rep(1,length(X2)), X2=X2)))
@@ -126,30 +125,56 @@ getEta = function(p) {
     return(eta)
 }
 
+
+#Get the exponent for the likelihood for the Metropolis step for finding the next p_ij
+getPExp = function(X0, p, Y, a, b, i, j, t.y, t.p) {
+    tot = 0
+    m = dim(p)[1]
+    for (k in i:m) {
+        tot = tot + t.p/2 * (log(p[k,j]/(1-p[k,j])) - a - b*X0[j]*prod((1+p[1:k,j]))/(1+p[k,j]))**2
+        tot = tot + t.y/2 * (Y[k,j] - X0[j]*prod(1+p[1:k,j]))**2
+    }
+    return(tot)
+}
+
+
+#Get the exponent for the likelihood for the Metropolis step for finding the next X0_j
+getX0Exp = function(X0, p, Y, a, b, j, t.y, t.p) {
+    tot = 0
+    m = dim(p)[1]
+    for (k in 1:m) {
+        tot = tot + t.p/2 * (log(p[k,j]/(1-p[k,j])) - a - b*X0[j]*prod((1+p[1:k,j]))/(1+p[k,j]))**2
+        tot = tot + t.y/2 * (Y[k,j] - X0[j]*prod(1+p[1:k,j]))**2
+    }
+    return(tot)
+}
+
+
 accept.u.t = vector()
 accept.u.c = vector()
+S = 100000
 
 for (i in 2:S) {
     #Print the iteration number:
     print(i)
 
     #Draw new precision parameters:
-    k.next = rgamma(n=1, shape=0.1+n/2, rate=0.00001+sum((X[[i-1]][['c']][1,]-mu.c[[i-1]])**2/(2*mu.c[[i-1]])) + sum((X[[i-1]][['t']][1,]-mu.t[[i-1]])**2/(2*mu.t[[i-1]])))
-    t.y.next = rgamma(n=1, shape=0.5+m*n/2, rate=0.0005+0.5*(tauysum(Y[['c']], X[[i-1]][['c']], p[[i-1]][['c']]) + tauysum(Y[['t']], X[[i-1]][['t']], p[[i-1]][['t']])))
-    t.p.next = rgamma(n=1, shape=0.5+m*n/2, rate=0.0005+0.5*(taupsum(Y[['c']], X[[i-1]][['c']], p[[i-1]][['c']], a.c, b.c) + taupsum(Y[['t']], X[[i-1]][['t']], p[[i-1]][['t']], a.t, b.t)))
+    k.next = rgamma(n=1, shape=0.1+n/2, rate=0.00001+sum((X0[[i-1]][['c']]-mu.c[i-1])**2/(2*mu.c[i-1])) + sum((X0[[i-1]][['t']]-mu.t[i-1])**2/(2*mu.t[i-1])))
+    t.y.next = rgamma(n=1, shape=0.5+m*n/2, rate=0.0005+0.5*(tauysum(Y[['c']], X0[[i-1]][['c']], p[[i-1]][['c']]) + tauysum(Y[['t']], X0[[i-1]][['t']], p[[i-1]][['t']])))
+    t.p.next = rgamma(n=1, shape=0.5+m*n/2, rate=0.0005+0.5*(taupsum(Y[['c']], X0[[i-1]][['c']], p[[i-1]][['c']], a.c, b.c) + taupsum(Y[['t']], X0[[i-1]][['t']], p[[i-1]][['t']], a.t, b.t)))
 
     #propose a gaussian jump for mu.t:
-    J = rnorm(n=1, mean=mu.t[[i-1]], sd=0.005)
-    R = exp(-500*J**2 - k.next/(2*J)*sum((X[[i-1]][['t']][1,] - J)**2)) * mu.t[[i-1]] / (exp(-500*mu.t[[i-1]]**2 - k.next/(2*mu.t[[i-1]])*sum((X[[i-1]][['t']][1,] - mu.t[[i-1]])**2)) * J)
+    J = rnorm(n=1, mean=mu.t[i-1], sd=0.005)
+    R = exp(-500*J**2 - k.next/(2*J)*sum((X0[[i-1]][['t']] - J)**2)) * mu.t[i-1] / (exp(-500*mu.t[i-1]**2 - k.next/(2*mu.t[i-1])*sum((X0[[i-1]][['t']] - mu.t[i-1])**2)) * J)
     U = runif(1)
-    if (J<0) {m.t.next = mu.t[[i-1]]
+    if (J<0) {m.t.next = mu.t[i-1]
     } else if (R>1) {m.t.next = J
     } else if (R>U) {m.t.next = J
-    } else {m.t.next = mu.t[[i-1]]}
+    } else {m.t.next = mu.t[i-1]}
 
     #propose a gaussian jump for mu.c:
-    J = rnorm(n=1, mean=mu.c[[i-1]], sd=0.005)
-    R = exp(-500*J**2 - k.next/(2*J)*sum((X[[i-1]][['c']][1,] - J)**2)) * mu.c[[i-1]] / (exp(-500*mu.c[[i-1]]**2 - k.next/(2*mu.c[[i-1]])*sum((X[[i-1]][['c']][1,] - mu.c[[i-1]])**2)) * J)
+    J = rnorm(n=1, mean=mu.c[i-1], sd=0.005)
+    R = exp(-500*J**2 - k.next/(2*J)*sum((X0[[i-1]][['c']] - J)**2)) * mu.c[i-1] / (exp(-500*mu.c[i-1]**2 - k.next/(2*mu.c[i-1])*sum((X0[[i-1]][['c']] - mu.c[i-1])**2)) * J)
     U = runif(1)
     if (J<0) { m.c.next = mu.c[[i-1]]
     } else if (R>1) { m.c.next = J 
@@ -157,7 +182,7 @@ for (i in 2:S) {
     } else {m.c.next = mu.c[[i-1]]}
 
     #Logistic regression coefficients for the treatment group:
-    mat = Xmat(X[[i-1]][['t']], p[[i-1]][['t']])
+    mat = Xmat(X0[[i-1]][['t']], p[[i-1]][['t']])
     eta = getEta(p[[i-1]][['t']])
     M1 = as.matrix(lm(eta~mat-1)[['coefficients']])
 
@@ -171,7 +196,7 @@ for (i in 2:S) {
 
 
     #Logistic regression coefficients for the control group:
-    mat = Xmat(X[[i-1]][['c']], p[[i-1]][['c']])
+    mat = Xmat(X0[[i-1]][['c']], p[[i-1]][['c']])
     eta = getEta(p[[i-1]][['c']])
     M1 = as.matrix(lm(eta~mat-1)[['coefficients']])
 
@@ -182,7 +207,67 @@ for (i in 2:S) {
     ab.c.next = mvrnorm(n=1, mu=M, Sigma=solve(P2 + t.p.next * solve(t(mat) %*% mat)))
     a.c.next = ab.c.next[1]
     b.c.next = ab.c.next[2]
+
+
+
+    #propose a gaussian jump for each p (control group):
+    orig = p.c.next = p[[i-1]][['c']]
+    for (j in 1:15) {
+        for (k in 1:4) {
+            J = rnorm(n=1, mean=p[[i-1]][['c']][k,j], sd=0.005)
+            if(J>0 && J<1) {
+                proposed = p.c.next
+                proposed[k,j] = J
+                R = exp(-getPExp(X0[[i-1]][['c']], proposed, Y[['c']], a.c.next, b.c.next, k, j, t.y.next, t.p.next)) * p[[i-1]][['c']][k,j] * (1-p[[i-1]][['c']][k,j]) / (exp(-getPExp(X0[[i-1]][['c']], p.c.next, Y[['c']], a.c.next, b.c.next, k, j, t.y.next, t.p.next)) * J * (1-J))
+                U = runif(1)
+                if (R>U) { p.c.next = proposed }
+            }
+        }
+    }
     
+
+    #propose a gaussian jump for each p (treatment group):
+    orig = p.t.next = p[[i-1]][['t']]
+    for (j in 1:15) {
+        for (k in 1:4) {
+            J = rnorm(n=1, mean=p[[i-1]][['t']][k,j], sd=0.005)
+            if(J>0 && J<1) {
+                proposed = p.t.next
+                proposed[k,j] = J
+                R = exp(-getPExp(X0[[i-1]][['t']], proposed, Y[['t']], a.t.next, b.t.next, k, j, t.y.next, t.p.next)) * p[[i-1]][['t']][k,j] * (1-p[[i-1]][['t']][k,j]) / (exp(-getPExp(X0[[i-1]][['t']], p.t.next, Y[['t']], a.t.next, b.t.next, k, j, t.y.next, t.p.next)) * J * (1-J))
+                U = runif(1)
+                if (R>U) { p.t.next = proposed }
+            }
+        }
+    }
+
+
+
+
+
+    #propose a gaussian jump for each X0 (control group):
+    orig = X0.c.next = X0[[i-1]][['c']]
+    for (j in 1:15) {
+        J = rnorm(n=1, mean=orig[j], sd=0.005)
+        proposed = X0.c.next
+        proposed[j] = J
+        R = exp(-getX0Exp(proposed, p.c.next, Y[['c']], a.c.next, b.c.next, j, t.y.next, t.p.next)) / exp(-getX0Exp(X0.c.next, p.c.next, Y[['c']], a.c.next, b.c.next, j, t.y.next, t.p.next))
+        U = runif(1)
+        if (R>U) { X0.c.next = proposed }
+    }
+
+
+    #propose a gaussian jump for each X0 (control group):
+    orig = X0.t.next = X0[[i-1]][['t']]
+    for (j in 1:15) {
+        J = rnorm(n=1, mean=orig[j], sd=0.005)
+        proposed = X0.t.next
+        proposed[j] = J
+        R = exp(-getX0Exp(proposed, p.t.next, Y[['t']], a.t.next, b.t.next, j, t.y.next, t.p.next)) / exp(-getX0Exp(X0.t.next, p.t.next, Y[['t']], a.t.next, b.t.next, j, t.y.next, t.p.next))
+        U = runif(1)
+        if (R>U) { X0.t.next = proposed }
+    }
+
 
     kappa = c(kappa, k.next)
     tau.y = c(tau.y, t.y.next)
@@ -193,4 +278,12 @@ for (i in 2:S) {
     beta.t = c(beta.t, b.t.next)
     alpha.c = c(alpha.c, a.c.next)
     beta.c = c(beta.c, b.c.next)
+    p[[i]] = list()
+    p[[i]][['c']] = p.c.next
+    p[[i]][['t']] = p.t.next
+    X0[[i]] = list()
+    X0[[i]][['c']] = X0.c.next
+    X0[[i]][['t']] = X0.t.next
+    
+    
 }

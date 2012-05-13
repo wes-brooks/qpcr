@@ -1,5 +1,12 @@
 \begin{thebibliography}{1}
 
+\bibitem{norway:2010}
+Turid Follestad, Tommy~S. Jorstad, Sten~E. Erlandsen, Arne~K. Sandvik, Atle~M.
+  Bones, and Mette Langaas.
+\newblock A bayesian hierarchical model for quantitative real-time pcr data.
+\newblock {\em Statistical Applications in Genetics and Molecular Biology},
+  9(1), 2010.
+
 \bibitem{hanlon:2012}
 Bret Hanlon and Anand~N. Vidyashankar.
 \newblock Inference for quantitation parameters in polymerase chain reactions
