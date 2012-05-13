@@ -20,8 +20,42 @@
 \maketitle
 
 <<label=read_data, echo=FALSE>>=
+    lh = readMat("../data/LH.mat")
 @
 
+<<label=prior, echo=FALSE>>=
+    #mu is the mean of the initial fluorescence, and also its variance (up to a scaling factor)
+    mu.t = abs(rnorm(n=1, mean=0, sd=5))
+    mu.c = abs(rnorm(n=1, mean=0, sd=5))
+    
+    #kappa is the scale of the precision of the initial fluorescence
+    kappa = rgamma(n=1, shape=0.1, rate=0.00001)
+    
+    #alpha and beta are logistic regression parameters that model the reaction efficiency decreasing with cycle number
+    a.t = rnorm(n=1, mean=10, sd=7.5)
+    a.c = rnorm(n=1, mean=10, sd=7.5)
+    b.t = rnorm(n=1, mean=-1.5, sd=0.5)
+    b.c = rnorm(n=1, mean=-1.5, sd=0.5)
+        
+    #tau.p is the precision of the logistic regression model for p
+    t.p = rgamma(n=1, shape=0.5, rate=0.0005)
+    
+    #tau.y is the precision of the fluorescence observation
+    t.y = rgamma(n=1, shape=0.5, rate=0.0005)    
+@
+
+
+<<label=mcmc, echo=flase>>=
+    S = 50000000
+    thin = 10000
+    burn = 500
+    
+    for (i in 1:S) {
+        for(c in dim(lh[['TargetMatrix']])[2])
+    }
+@
+
+    
 \section{Overview}
 The technology called the Quantitative Polymerase Chain Reaction (qPCR) is commonly used in experiments to measure the difference in gene expression between subjects exposed to different treatments or conditions. Because DNA particles are too tiny and too few to count directly, qPCR amplifies the particles via repeated iterations of the polymerase reaction. Then the amplified particles are counted and used for inference about the original particles.\\
 
